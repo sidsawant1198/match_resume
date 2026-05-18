@@ -1,5 +1,4 @@
 streamlit
 python-dotenv
-langchain
 pypdf
 google-generativeai
