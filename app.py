@@ -243,7 +243,7 @@ hr { border-color: rgba(255,255,255,0.06) !important; }
 """, unsafe_allow_html=True)
 
 # ── Configure model ───────────────────────────────────────────────────────────
-api_key = os.getenv("GOOGLE_GEMINI_API")
+api_key = os.getenv("GOOGLE_GEMINI_API") or st.secrets.get("GOOGLE_GEMINI_API")
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-2.0-flash-lite")
 
