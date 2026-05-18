@@ -13,7 +13,7 @@ api_key = os.getenv("GOOGLE_GEMINI_API")
 
 genai.configure(api_key= api_key)
 
-model = genai.GenerativeModel("gemini-flash-lite-latest")
+model = genai.GenerativeModel("gemini-2.0-flash")
 
 st.header("SKILL MATCHER :blue[AI based skill matching tool!]", divider="green")
 
