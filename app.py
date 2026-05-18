@@ -32,6 +32,16 @@ html, body, [class*="css"] {
 /* ── Hide default streamlit chrome ── */
 #MainMenu, footer, header { visibility: hidden; }
 
+/* ── Remove Streamlit default top padding ── */
+.block-container {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+}
+
+[data-testid="stAppViewContainer"] > .main {
+    padding-top: 0rem !important;
+}
+
 /* ── Hero banner ── */
 .hero {
     background: linear-gradient(135deg, #0f0f1a 0%, #1a0f2e 50%, #0f1a2e 100%);
