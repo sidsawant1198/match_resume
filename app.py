@@ -287,21 +287,21 @@ st.markdown("""
 st.markdown("""
 <div class="steps-row">
     <div class="step-card">
-        <div class="step-num">01</div>
+        <div class="step-num">1</div>
         <div class="step-text">
             <strong>Upload Resume</strong>
             <span>Add your PDF resume in the sidebar panel on the left.</span>
         </div>
     </div>
     <div class="step-card">
-        <div class="step-num">02</div>
+        <div class="step-num">2</div>
         <div class="step-text">
             <strong>Paste Job Description</strong>
-            <span>Copy the full JD from any job portal and paste it below.</span>
+            <span>Copy the full job description and paste it below.</span>
         </div>
     </div>
     <div class="step-card">
-        <div class="step-num">03</div>
+        <div class="step-num">3</div>
         <div class="step-text">
             <strong>Get Your Analysis</strong>
             <span>Receive ATS score, SWOT, and two AI-optimised resume versions.</span>
