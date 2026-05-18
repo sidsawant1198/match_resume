@@ -245,7 +245,7 @@ hr { border-color: rgba(255,255,255,0.06) !important; }
 # ── Configure model ───────────────────────────────────────────────────────────
 api_key = os.getenv("GOOGLE_GEMINI_API")
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel("gemini-2.0-flash")
+model = genai.GenerativeModel("gemini-2.0-flash-lite")
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
