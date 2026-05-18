@@ -203,6 +203,17 @@ html, body, [class*="css"] {
     margin-top: 8px;
 }
 
+/* ── Error box ── */
+.error-box {
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.25);
+    border-radius: 10px;
+    padding: 14px 18px;
+    color: #f87171;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
 /* ── Text area ── */
 .stTextArea textarea {
     background: rgba(255,255,255,0.04) !important;
@@ -226,6 +237,27 @@ html, body, [class*="css"] {
     padding: 8px !important;
 }
 
+/* ── Analyse button ── */
+.stButton > button {
+    background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 14px 32px !important;
+    font-family: 'Syne', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    letter-spacing: 0.5px !important;
+    width: 100% !important;
+    cursor: pointer !important;
+    transition: opacity 0.2s !important;
+}
+.stButton > button:hover { opacity: 0.88 !important; }
+.stButton > button:disabled {
+    background: rgba(99,102,241,0.25) !important;
+    cursor: not-allowed !important;
+}
+
 /* ── Spinner ── */
 .stSpinner > div { border-top-color: #6366f1 !important; }
 
@@ -244,6 +276,10 @@ hr { border-color: rgba(255,255,255,0.06) !important; }
 
 # ── Configure model ───────────────────────────────────────────────────────────
 api_key = os.getenv("GOOGLE_GEMINI_API") or st.secrets.get("GOOGLE_GEMINI_API")
+if not api_key:
+    st.error("⚠ Gemini API key not found. Set GOOGLE_GEMINI_API in your .env or Streamlit secrets.")
+    st.stop()
+
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-2.5-flash-lite")
 
@@ -259,12 +295,16 @@ with st.sidebar:
     st.markdown('<div class="section-label">Upload Resume</div>', unsafe_allow_html=True)
     pdf_doc = st.file_uploader("PDF only", type=["pdf"], label_visibility="collapsed")
 
+    pdf_text = None
     if pdf_doc:
-        st.success(f"✓ {pdf_doc.name}")
-        pdf_text = extract_text(pdf_doc)
+        try:
+            pdf_text = extract_text(pdf_doc)
+            st.success(f"✓ {pdf_doc.name}")
+        except ValueError as e:
+            # Catches scanned PDF, empty PDF, corrupt PDF
+            st.markdown(f'<div class="warn-box">⚠ {e}</div>', unsafe_allow_html=True)
     else:
         st.markdown('<div class="warn-box">⚠ Please upload your resume to get started.</div>', unsafe_allow_html=True)
-        pdf_text = None
 
     st.markdown("---")
     st.markdown("""
@@ -314,14 +354,22 @@ st.markdown("""
 st.markdown('<div class="section-label">Job Description</div>', unsafe_allow_html=True)
 job_desc = st.text_area(
     "job_desc",
-    placeholder="Paste the full job description here, then press Ctrl+Enter...",
+    placeholder="Paste the full job description here...",
     height=220,
     max_chars=10000,
     label_visibility="collapsed"
 )
 
+# ── Analyse Button (gates the API call) ───────────────────────────────────────
+analyse = st.button(
+    "🎯 Analyse My Resume",
+    disabled=(not pdf_text or not job_desc.strip())
+)
+
 # ── Prompt & Response ─────────────────────────────────────────────────────────
-prompt = f'''Assuming you are an expert in job skill matching and profile short listing.
+if analyse:
+    # Both inputs are guaranteed to be present here (button is disabled otherwise)
+    prompt = f'''Assuming you are an expert in job skill matching and profile short listing.
 You have the resume = {pdf_text} and job description = {job_desc}. Using this data generate the
 output on the following outline:
 
@@ -334,10 +382,7 @@ output on the following outline:
   being maximised while implementing all the points discussed above.
 * Prepare these resume in such a way that it can be copied and pasted in word and generate pdf.'''
 
-if job_desc:
-    if pdf_doc is None:
-        st.markdown('<div class="warn-box">⚠ You forgot to upload your resume! Add it in the sidebar first.</div>', unsafe_allow_html=True)
-    else:
+    try:
         with st.spinner("Analysing your resume against the job description..."):
             response = model.generate_content(prompt)
 
@@ -350,3 +395,6 @@ if job_desc:
         """, unsafe_allow_html=True)
 
         st.markdown(response.text)
+
+    except Exception as e:
+        st.markdown(f'<div class="error-box">❌ Something went wrong: {e}</div>', unsafe_allow_html=True)
